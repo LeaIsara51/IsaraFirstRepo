@@ -1,0 +1,40 @@
+---
+title: "Exercice Rmarkdown"
+author: "Léa Danieli"
+date: '2022-05-06'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Average mass of Starwars species
+
+There are many different species that inhibit the Starwars worlds. In order to properly administer health outcomes to all these diverse groups, it is important to understand the differences between species. For instance, awarness of average body mass tells Starwars doctors which doses of medications are appropriate for each species. Here we have compiled the average body mass (in lbs) for many species within Starwars worlds.
+
+```{r starwars,echo=T, eval=T, collapse=TRUE} 
+library(tidyverse)
+library(knitr)
+data(starwars, package = "dplyr")
+missing <- which(is.na(starwars$mass))
+sw <- starwars[-missing, ]
+sw.table <- sw %>% 
+              filter(height >190)%>%
+              mutate(mass_lb = mass * 2.2)%>%
+              group_by(species)%>%
+              summarize(Mean_Mass = mean(mass, na.rm = T))
+kable(sw.table)
+```
+
+## Plot of mass of Starwars species (in lbs)
+
+It is often easier to understand trends across different groups when we visualize with a plot. Here we have reproduced the same data as above in a plot. Here we can see that the idea that commonly held belief that Wookies have the largest mass is false - the Kaleesh (and even the average Droid!) are much heavier.
+
+```{r plot, echo=T}
+library(ggplot2)
+ggplot(data = sw.table, aes(x = species, y = Mean_Mass)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ggtitle("Mean mass (lbs) of Starwars species")
+```
